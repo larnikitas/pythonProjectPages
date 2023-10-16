@@ -11,7 +11,7 @@ class Student:
         self.height = height
         self.weight = weight
         self.gender = gender
-        self.courses = {}
+        self.courses = {'Math': -1, 'History': -1, 'Physics': -1, 'English': -1, 'Biology': -1}
 
     def add_grade(self, course_name, grade):
         self.courses[course_name] = grade
@@ -21,6 +21,36 @@ class Student:
             return -1
         else:
             return sum(self.courses.values()) / len(self.courses)
+
+    def get_bmi(self):
+        """
+        Calculate and return the BMI (Body Mass Index).
+        Formula: weight (kg) / height (m)^2
+        Note: Height should be converted from cm to m.
+        """
+        height_m = self.height / 100  # converting height to meters
+        bmi = self.weight / (height_m ** 2)
+        return bmi
+
+    def get_bmi_category(self):
+        """
+        Return the BMI category of the student based on their BMI value.
+
+        Categories:
+        - Underweight: Below 18.5
+        - Normal: 18.5-25
+        - Overweight: 25.0-30
+        - Obesity: 30 and above
+        """
+        bmi = self.get_bmi()
+        if bmi < 18.5:
+            return "Underweight"
+        elif bmi < 25:
+            return "Normal"
+        elif bmi < 30:
+            return "Overweight"
+        else:  # bmi >= 30
+            return "Obesity"
 
     def __str__(self):
         return f"id: {self.id} first name: {self.fname}, last name: {self.lname} genter: {self.genter} "
@@ -153,6 +183,18 @@ class Classroom:
         # Return the next ID
         return max_id + 1
 
+    def get_min_student_id(self):
+
+        # Check if there are no students
+        if not self.students:
+            return 1
+
+        # Find the maximum ID among the students
+        min_id = min(student.id for student in self.students)
+
+        # Return the next ID
+        return min_id
+
     def get_student_by_id(self, id):
         for student in self.students:
             if student.id == id:
@@ -170,3 +212,142 @@ class Classroom:
             student.gender = gender
             return True
         return False
+
+    def delete_student(self, student_id):
+        for i, student in enumerate(self.students):
+            if student.id == student_id:
+                del self.students[i]
+                return True  # Student was found and deleted
+
+        return False  # Student was not found
+
+    def generate_dataframe(self):
+
+        # Extracting student data in a structured format
+        data = []
+        for student in self.students:
+            student_data = {
+                'ID': student.id,
+                'Last Name': student.lname,
+                'First Name': student.fname,
+                'Date of Birth': student.dateBirth,
+                'Height': student.height,
+                'Weight': student.weight,
+                'Gender': student.gender,
+                'Math': student.courses['Math'],
+                'History': student.courses['History'],
+                'Physics': student.courses['Physics'],
+                'English': student.courses['English'],
+                'Biology': student.courses['Biology'],
+                'Average Grade': student.average_grade(),
+                'BMI': student.get_bmi(),
+                'BMI Category': student.get_bmi_category()
+            }
+            data.append(student_data)
+
+        # Creating a DataFrame
+        df = pd.DataFrame(data)
+
+        # Setting 'ID' as the index
+        df.set_index('ID', inplace=True)
+
+        return df
+
+    def bubble_sort_students_by_grade(self):
+        """
+        Sorts a list of students based on their average grade using bubble sort.
+
+        Parameters:
+        - students (list): A list of Student instances.
+
+        Returns:
+        list: A list containing sorted Student instances.
+        """
+        n = len(self.students)
+
+        # Traverse through all elements in the list
+        for i in range(n):
+            # Last i elements are already in place, no need to check them
+            for j in range(0, n - i - 1):
+
+                # Traverse the list from 0 to n-i-1.
+                # Swap if the element found is greater than the next element
+                if self.students[j].average_grade() < self.students[j + 1].average_grade():
+                    self.students[j], self.students[j + 1] = self.students[j + 1], self.students[j]  # swap values
+
+    def selection_sort_students_by_bmi(self):
+        """
+        Sorts a list of students based on their average grade using selection sort.
+
+        Parameters:
+        - students (list): A list of Student instances.
+
+        Returns:
+        list: A list containing sorted Student instances.
+        """
+        n = len(self.students)
+
+        # Traverse through all array elements starting from 0 up to n-1
+        for i in range(n):
+            # Find the minimum element in the remaining unsorted array
+            min_idx = i
+            for j in range(i + 1, n):
+                if self.students[min_idx].get_bmi() > self.students[j].get_bmi():
+                    min_idx = j
+
+            # Swap the found minimum element with the first element
+            self.students[i], self.students[min_idx] = self.students[min_idx], self.students[i]
+
+    def sort_students_by_name(self):
+        """
+        Sort the students first by last name and then by first name using bubble sort.
+        """
+        n = len(self.students)
+        for i in range(n):
+            for j in range(0, n - i - 1):
+                # Check if the lname is greater or if the lName is the same and fname is greater
+                if self.students[j].lname > self.students[j + 1].lname or \
+                        (self.students[j].lname == self.students[j + 1].lname and \
+                         self.students[j].fname > self.students[j + 1].fname):
+                    # Swap if the condition is true
+                    self.students[j], self.students[j + 1] = self.students[j + 1], self.students[j]
+
+    def sort_students_by_id(self):
+        """
+        Sort the students by id using Python's built-in sort function.
+        """
+        self.students.sort(key=lambda student: student.id)
+
+    def binary_search_id(self, target_id):
+        """
+        Finds a student by ID using binary search.
+
+        Parameters:
+         - target_id (int): The ID of the student to search for.
+
+        Returns:
+        Student: The Student instance with the ID `target_id`, or None if not found.
+        """
+        # sort first by id before searching (the binary searh works only on sorted list based on the target_id
+        self.sort_students_by_id()
+
+        left, right = 0, len(self.students) - 1
+
+        while left <= right:
+            mid = left + (right - left) // 2
+            mid_id = self.students[mid].id
+
+            # Check if ID is present at mid
+            if mid_id == target_id:
+                return self.students[mid]
+
+            # If ID is greater, ignore left half
+            elif mid_id < target_id:
+                left = mid + 1
+
+            # If ID is smaller, ignore right half
+            else:
+                right = mid - 1
+
+        # If we reach here, the element was not present
+        return None
