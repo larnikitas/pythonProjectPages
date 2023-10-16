@@ -28,5 +28,5 @@ def delete_st(my_class_room, student):
     if st.button("Delete Now", use_container_width=True):
         deleted = my_class_room.delete_student(student.id)
         if deleted:
-            st.success("Student has been deleted successfully!")ok?
+            st.success("Student has been deleted successfully!")
 
