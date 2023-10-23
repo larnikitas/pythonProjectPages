@@ -5,7 +5,7 @@ def app(my_class_room):
     st.title("Student to Delete Record")
     # Input for the student ID
     min_id = my_class_room.get_min_student_id()
-    student_id = st.number_input("Enter Student ID", min_value=1, value=min_id, placeholder='Enter to apply or press Search button')
+    student_id = st.number_input("Enter Student ID", min_value=1, value=min_id)
     student = my_class_room.get_student_by_id(student_id)
 
     # Button to search for the student

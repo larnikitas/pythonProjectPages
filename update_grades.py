@@ -6,7 +6,7 @@ def app(my_class_room):
     st.title("Student Grades Modifier")
     # Input for the student ID
     updated = False
-    student_id = st.number_input("Enter Student ID", min_value=1, value=1, placeholder='Enter to apply or press Search button')
+    student_id = st.number_input("Enter Student ID", min_value=1, value=1)
     student = my_class_room.get_student_by_id(student_id)
     # Button to search for the student
     if st.button("Search"):
